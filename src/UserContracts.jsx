@@ -53,45 +53,36 @@ export default function UserContracts() {
     fetchContracts();
   }, []);
 
-  const handlePrint = () => {
+const handlePrint = () => {
     const doc = new jsPDF();
     contracts.forEach((contract, index) => {
-      doc.text(`Contract ${index + 1}`, 10, 10 + index * 10);
-      doc.text(`Name: ${contract.contract_name}`, 10, 20 + index * 10);
-      doc.text(`Signing Date: ${contract.signing_date}`, 10, 30 + index * 10);
-      doc.text(
-        `Expiration Date: ${contract.expiration_date}`,
-        10,
-        40 + index * 10
-      );
-      doc.text(`Total Cost: ${contract.total_cost}`, 10, 50 + index * 10);
-      doc.text(`Approved By: ${contract.approved_by}`, 10, 60 + index * 10);
-      doc.text(
-        `Warranty Start: ${contract.warrantyStartDate}`,
-        10,
-        70 + index * 10
-      );
-      doc.text(
-        `Warranty End: ${contract.warrantyEndDate}`,
-        10,
-        80 + index * 10
-      );
+        if (index > 0) {
+            doc.addPage(); // Add a new page for the next contract
+        }
+        doc.text(`Contract ${index + 1}`, 10, 10);
+        doc.text(`Name: ${contract.contract_name}`, 10, 20);
+        doc.text(`Signing Date: ${contract.signing_date}`, 10, 30);
+        doc.text(`Expiration Date: ${contract.expiration_date}`, 10, 40);
+        doc.text(`Total Cost: ${contract.total_cost}`, 10, 50);
+        doc.text(`Approved By: ${contract.approved_by}`, 10, 60);
+        doc.text(`Warranty Start: ${contract.warrantyStartDate}`, 10, 70);
+        doc.text(`Warranty End: ${contract.warrantyEndDate}`, 10, 80);
     });
     doc.save("contracts.pdf");
-  };
+};
 
   if (loading) return <p>Loading...</p>;
 
   return (
-    <Container className="py-5">
+    <Container className="py-5 text-center">
       <Button
         variant="secondary"
-        className="mb-4"
+        className="mb-4 w-25"
         onClick={() => navigate("/profile")}
       >
         Back to Profile
       </Button>
-      <Button variant="primary" className="mb-4 ms-2" onClick={handlePrint}>
+      <Button variant="primary" className="mb-4 ms-2 w-25" onClick={handlePrint}>
         Print Contracts
       </Button>
       <Row>
@@ -107,14 +98,21 @@ export default function UserContracts() {
               ? "warning"
               : "light";
 
+            const textColor =
+            daysToExpire <= 3
+              ? "white"
+              : daysToExpire <= 10
+              ? "dark"
+              : "dark";
+        
           return (
             <Col md={4} key={contract.id} className="mb-4">
               <Card
-                className={`p-3 shadow-sm bg-${cardColor}`}
+                className={`p-3 shadow-sm bg-${cardColor} text-${textColor}`}
                 style={{ height: "100%" }}
               >
                 <Card.Body>
-                  <Card.Title>{contract.contract_name}</Card.Title>
+                  <Card.Title className="mb-5">{contract.contract_name}</Card.Title>
                   <Card.Text>
                     <strong>Signing Date:</strong> {contract.signing_date}
                   </Card.Text>

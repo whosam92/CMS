@@ -65,8 +65,54 @@ export default function Profile() {
     });
   };
 
+
+  const validateForm = () => {
+    const { firstName, lastName, email, phone, location } = adminData;
+    if (!firstName || !lastName || !email || !phone || !location) {
+      Swal.fire({
+        title: "Error",
+        text: "All fields are required.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return false;
+    }
+
+    if (!/^[a-zA-Z]*$/.test(firstName) || !/^[a-zA-Z]*$/.test(lastName)) {
+      Swal.fire({
+        title: "Error",
+        text: "First name and last name must contain only alphabets.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return false;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      Swal.fire({
+        title: "Error",
+        text: "Invalid email format.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return false;
+    }
+    if (!/^07\d{8}$/.test(phone)) {
+      Swal.fire({
+        title: "Error",
+        text: "Phone number must start with 07 and be exactly 10 digits long.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return false;
+    }
+    return true;
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
     try {
       const user = auth.currentUser;
       if (user) {
