@@ -66,9 +66,9 @@ export default function TestimonialComp() {
                     }}
                   />
                   <p className="fs-6 text-muted px-2">
-                    “Dolores sed duo clita tempor justo dolor et stet lorem kasd
-                    labore dolore lorem ipsum. At lorem lorem magna ut et,
-                    nonumy et labore et tempor diam tempor erat.”
+                    ““APEX team has been through so much lately with the merger
+                    going on. The positivity and transparency have made this
+                    transition so much easier for all of us. Thank you!” .”
                   </p>
                   <div
                     className="bg-primary mx-auto mb-3"
@@ -98,9 +98,10 @@ export default function TestimonialComp() {
                     }}
                   />
                   <p className="fs-6 text-muted px-2">
-                    “Dolores sed duo clita tempor justo dolor et stet lorem kasd
-                    labore dolore lorem ipsum. At lorem lorem magna ut et,
-                    nonumy et labore et tempor diam tempor erat.”
+                    ““It means so much to me that APEX team care about making
+                    everyone feel welcome and listen activaly for all the
+                    requirments we asked for. They help me feel safe and bring my
+                    dream house comes true”
                   </p>
                   <div
                     className="bg-primary mx-auto mb-3"
