@@ -16,6 +16,7 @@ import App from "./App";
 
 import Auth from "./Auth";
 import UserProfile from "./UserProfile"; // added this line
+import UserContracts from "./UserContracts"; // added this line
 
 createRoot(document.getElementById("root")).render(
   <Router>
@@ -30,6 +31,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="team" element={<Team />} />
         <Route path="testimonial" element={<Testimonial />} />
         <Route path="profile" element={<UserProfile />} /> // added this line
+        <Route path="profile/contracts" element={<UserContracts />} />{" "}
+        {/* added this line */}
         <Route path="*" element={<Err404 />} /> {/* Handle unmatched routes */}
       </Route>
       <Route path="/auth/" element={<Auth />}>
