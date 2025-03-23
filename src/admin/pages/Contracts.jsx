@@ -11,6 +11,7 @@ import {
   orderBy,
   startAt,
   endAt,
+  getDoc 
 } from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +28,7 @@ const Contracts = () => {
     expiration_date: "",
     signing_date: "",
     status: "pending", // Default status is "pending"
+    user_id: "",
   });
   const [selectedContract, setSelectedContract] = useState(null); // To store the contract being edited
   const [searchQuery, setSearchQuery] = useState(""); // For the search query
@@ -51,10 +53,22 @@ const Contracts = () => {
         }
 
         const querySnapshot = await getDocs(q);
-        const contractsList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const contractsList = [];
+
+        for (const docSnap of querySnapshot.docs) {
+          const contractData = docSnap.data();
+          const contractId = docSnap.id;
+    
+          // Fetch user data based on userId stored in the contract
+          const userDoc = await getDoc(doc(db, "users", contractData.user_id)); // Assuming userId is stored in each contract
+          const userData = userDoc.exists() ? userDoc.data() : null; // Ensure userData is not undefined
+    
+          contractsList.push({
+            id: contractId,
+            ...contractData,
+            userName: userData ? `${userData.firstName} ${userData.lastName}` : "N/A", // Fallback if userData is null
+          });
+        }
         setContracts(contractsList);
       } catch (error) {
         console.error("Error fetching contracts data", error);
@@ -114,7 +128,8 @@ const Contracts = () => {
         total_cost: "",
         expiration_date: "",
         signing_date: "",
-        status: "pending", // Reset to default status
+        status: "pending",
+        user_id: "", // Reset to default status
       });
     } catch (error) {
       console.error("Error saving contract data", error);
@@ -149,7 +164,8 @@ const Contracts = () => {
       total_cost: "",
       expiration_date: "",
       signing_date: "",
-      status: "pending", // Reset to default status
+      status: "pending",
+      user_id: "", // Reset to default status
     });
     setEditMode(false); // Switch to add mode
     setShowModal(true);
@@ -200,6 +216,7 @@ const Contracts = () => {
                 <tr>
                   <th scope="col">Contract Name</th>
                   <th scope="col">Approved By</th>
+                  <th scope="col">User Name</th>
                   <th scope="col">Status</th>
                   <th scope="col">Total Cost</th>
                   <th scope="col">Expiration Date</th>
@@ -215,6 +232,7 @@ const Contracts = () => {
                       {contract.approved_by ||
                         (contract.status === "approved" ? "Approved" : "-")}
                     </td>
+                    <td>{contract.userName || "-"}</td>
                     <td>
                       <span
                         className={`badge bg-${getStatusBadge(
