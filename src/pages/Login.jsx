@@ -9,9 +9,14 @@ import {
   MDBInput,
 } from "mdb-react-ui-kit";
 import { auth, db } from "../firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { collection, doc, getDoc } from "firebase/firestore";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+
 
 import "/public/css/input.css";
 
@@ -32,17 +37,13 @@ function Login() {
       const user = userCredential.user;
 
       const userDoc = await getDoc(doc(db, "users", user.uid));
-
       if (userDoc.exists()) {
         const userData = userDoc.data();
-
         if (userData.role === "admin") {
-          // Dynamically load the admin entry point
           import("/src/admin/main-admin.jsx").then(() => {
             navigate("/admin");
           });
         } else {
-          // Dynamically load the main entry point
           import("/src/main.jsx").then(() => {
             navigate("/");
           });
@@ -52,7 +53,6 @@ function Login() {
       }
     } catch (err) {
       console.error("Login Error:", err.message);
-
       if (err.code === "auth/user-not-found") {
         setError("Email not registered. Please sign up.");
       } else if (err.code === "auth/wrong-password") {
@@ -69,18 +69,37 @@ function Login() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.role === "admin") {
+          import("/src/admin/main-admin.jsx").then(() => {
+            navigate("/admin");
+          });
+        } else {
+          import("/src/main.jsx").then(() => {
+            navigate("/");
+          });
+        }
+      } else {
+        setError("User data not found in the database.");
+      }
+    } catch (error) {
+      console.error("Google Login Error:", error.message);
+      setError("Google sign-in failed. Please try again.");
+    }
+  };
+
   return (
     <>
       <MDBContainer fluid className="my-2 align-items-center w-75">
         <MDBRow className="g-0 justify-content-center">
-          {/* <MDBCol md='6'>
-          <img 
-            src="https://mdbootstrap.com/img/new/ecommerce/vertical/004.jpg"
-            className="w-100 rounded-4 shadow-4"
-            alt="Login Illustration"
-          />
-        </MDBCol> */}
-
           <MDBCol md="6">
             <MDBCard className="my-5 cascading-right form-background ">
               <MDBCardBody
@@ -120,6 +139,19 @@ function Login() {
                     type="submit"
                   >
                     Login
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="btn btn-outline-light w-100 mb-3"
+                  >
+                    <img
+                      src="https://img.icons8.com/color/16/000000/google-logo.png"
+                      alt="Google logo"
+                      className="me-2"
+                    />
+                    Sign in with Google
                   </button>
 
                   {error && (
