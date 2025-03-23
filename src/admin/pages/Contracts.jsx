@@ -6,6 +6,11 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  query,
+  where,
+  orderBy,
+  startAt,
+  endAt,
 } from "firebase/firestore";
 import { db } from "../config/Firebase";
 import { useNavigate } from "react-router-dom";
@@ -24,13 +29,28 @@ const Contracts = () => {
     status: "pending", // Default status is "pending"
   });
   const [selectedContract, setSelectedContract] = useState(null); // To store the contract being edited
+  const [searchQuery, setSearchQuery] = useState(""); // For the search query
 
   const navigate = useNavigate();
 
+  // Fetch contracts from Firestore with or without search filter
   useEffect(() => {
     const fetchContracts = async () => {
+      setLoading(true);
       try {
-        const querySnapshot = await getDocs(collection(db, "contracts"));
+        let q = collection(db, "contracts");
+
+        // If there's a search query, filter contracts based on contract name
+        if (searchQuery) {
+          q = query(
+            collection(db, "contracts"),
+            orderBy("contract_name"),
+            startAt(searchQuery),
+            endAt(searchQuery + "\uf8ff")
+          );
+        }
+
+        const querySnapshot = await getDocs(q);
         const contractsList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -44,7 +64,7 @@ const Contracts = () => {
     };
 
     fetchContracts();
-  }, []);
+  }, [searchQuery]); // Re-fetch contracts when search query changes
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -136,87 +156,105 @@ const Contracts = () => {
   };
 
   const handleView = (contract) => {
-    navigate("/contract-details", { state: { contract } }); // Pass contract to the details page
+    navigate("/admin/contract-details", { state: { contract } }); // Pass contract to the details page
   };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    // Capitalize the first letter and make the rest lowercase
+    const formattedValue =
+      value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    setSearchQuery(formattedValue);
+  };
+  
 
   return (
     <div className="container py-4">
-       <div className="d-flex justify-content-between align-items-center mx-3 mb-4 pb-4">
-       <h2 className="text-center mb-0">Contract List</h2>
+      <div className="d-flex justify-content-between align-items-center mx-3 mb-4 pb-4">
+        <h2 className="text-center mb-0">Contract List</h2>
         <button className="btn btn-warning" onClick={handleAddNew}>
           Add New Contract
         </button>
-       
       </div>
 
+      {/* Search Input */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by contract name"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="form-control"
+        />
+      </div>
 
       {loading ? (
         <div className="text-center">Loading...</div>
       ) : contracts.length === 0 ? (
         <div className="text-center">No contracts found.</div>
       ) : (
-          <div className="card">
-            <div className="table-responsive">
-              <table className="table table-hover table-striped align-middle table-bordered">
-                <thead className="table-dark color-warning text-center">
-                  <tr>
-                    <th scope="col">Contract Name</th>
-                    <th scope="col">Approved By</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Total Cost</th>
-                    <th scope="col">Expiration Date</th>
-                    <th scope="col">Signing Date</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="text-center">
-                  {contracts.map((contract) => (
-                    <tr key={contract.id}>
-                      <td>{contract.contract_name}</td>
-                      <td>
-                        {contract.approved_by ||
-                          (contract.status === "approved" ? "Approved" : "-")}
-                      </td>
-                      <td>
-                        <span
-                          className={`badge bg-${getStatusBadge(
-                            contract.status
-                          )} text-uppercase p-2 `}
+        <div className="card">
+          <div className="table-responsive">
+            <table className="table table-hover table-striped align-middle table-bordered">
+              <thead className="table-dark color-warning text-center">
+                <tr>
+                  <th scope="col">Contract Name</th>
+                  <th scope="col">Approved By</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Total Cost</th>
+                  <th scope="col">Expiration Date</th>
+                  <th scope="col">Signing Date</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-center">
+                {contracts.map((contract) => (
+                  <tr key={contract.id}>
+                    <td>{contract.contract_name}</td>
+                    <td>
+                      {contract.approved_by ||
+                        (contract.status === "approved" ? "Approved" : "-")}
+                    </td>
+                    <td>
+                      <span
+                        className={`badge bg-${getStatusBadge(
+                          contract.status
+                        )} text-uppercase p-2 `}
+                      >
+                        {contract.status}
+                      </span>
+                    </td>
+                    <td>${contract.total_cost}</td>
+                    <td>{contract.expiration_date}</td>
+                    <td>{contract.signing_date}</td>
+                    <td>
+                      <div className="d-flex gap-2 justify-content-center">
+                        <button
+                          className="btn btn-outline-info btn-sm"
+                          onClick={() => handleView(contract)}
                         >
-                          {contract.status}
-                        </span>
-                      </td>
-                      <td>${contract.total_cost}</td>
-                      <td>{contract.expiration_date}</td>
-                      <td>{contract.signing_date}</td>
-                      <td>
-                        <div className="d-flex gap-2 justify-content-center">
-                          <button
-                            className="btn btn-outline-info btn-sm"
-                            onClick={() => handleView(contract)}
-                          >
-                            View
-                          </button>
-                          <button
-                            className="btn btn-outline-warning btn-sm"
-                            onClick={() => handleEdit(contract)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="btn btn-outline-danger btn-sm"
-                            onClick={() => handleDelete(contract.id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          View
+                        </button>
+                        <button
+                          className="btn btn-outline-warning btn-sm"
+                          onClick={() => handleEdit(contract)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-outline-danger btn-sm"
+                          onClick={() => handleDelete(contract.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        </div>
       )}
 
       {/* Modal */}

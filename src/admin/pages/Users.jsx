@@ -14,6 +14,7 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [newUser, setNewUser] = useState({
     first_name: "",
     last_name: "",
@@ -43,17 +44,30 @@ const Users = () => {
     fetchUsers();
   }, []);
 
+  const filteredUsers = users.filter((user) =>
+    `${user.first_name} ${user.last_name} ${user.email} ${user.phone} ${user.location} ${user.role}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
   // Handle adding a new user
   const handleAddUser = async () => {
     try {
       await addDoc(collection(db, "users"), newUser);
-      setNewUser({ first_name: "", last_name: "", email: "", phone: "", location: "", role: "User" });
-      setShowAddModal(false); // Close modal
-      fetchUsers(); // Re-fetch users
+      setNewUser({
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone: "",
+        location: "",
+        role: "User",
+      });
+      setShowAddModal(false);
+      fetchUsers();
       Swal.fire({
-        title: 'User added successfully!',
-        icon: 'success',
-        confirmButtonText: 'OK'
+        title: "User added successfully!",
+        icon: "success",
+        confirmButtonText: "OK",
       });
     } catch (error) {
       console.error("Error adding user", error);
@@ -62,187 +76,129 @@ const Users = () => {
 
   // Handle deleting a user
   const handleDeleteUser = async (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await deleteDoc(doc(db, "users", id));
-        fetchUsers(); // Re-fetch users after deletion
-        Swal.fire({
-          title: 'User deleted successfully!',
-          icon: 'success',
-          confirmButtonText: 'OK'
-        });
-      } catch (error) {
-        console.error("Error deleting user", error);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteDoc(doc(db, "users", id));
+          fetchUsers();
+          Swal.fire("Deleted!", "User has been deleted.", "success");
+        } catch (error) {
+          console.error("Error deleting user", error);
+        }
       }
-    }
+    });
   };
 
   return (
     <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mx-3 mb-4 pb-4">
-        <h2 className="text-center mb-0">Users List</h2>
-        <Button
-          variant="warning"
-          onClick={() => setShowAddModal(true)}
-          className="mb-4 text-center"
-        >
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2>Users List</h2>
+        <Button variant="warning" onClick={() => setShowAddModal(true)}>
           Add New User
         </Button>
       </div>
 
-      <div className="row mb-4 text-center">
-        <div className="col-md-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Total Users</Card.Title>
-              <Card.Text className="fs-1">
-                {loading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  users.length
-                )}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </div>
-
-        <div className="col-md-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Active Users</Card.Title>
-              <Card.Text className="fs-1">
-                {loading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  users.filter((user) => user.role.toLowerCase() === "user")
-                    .length
-                )}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </div>
-
-        <div className="col-md-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Admins</Card.Title>
-              <Card.Text className="fs-1">
-                {loading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  users.filter((user) => user.role.toLowerCase() === "admin").length
-                )}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </div>
+      <div className="row mb-4">
+        {["Total Users", "Active Users", "Admins"].map((title, index) => (
+          <div className="col-md-4" key={index}>
+            <Card>
+              <Card.Body>
+                <Card.Title>{title}</Card.Title>
+                <Card.Text className="fs-1">
+                  {loading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : title === "Total Users" ? (
+                    users.length
+                  ) : (
+                    users.filter(
+                      (user) =>
+                        user.role.toLowerCase() ===
+                        (title === "Admins" ? "admin" : "user")
+                    ).length
+                  )}
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </div>
+        ))}
       </div>
+
+      <input
+        type="text"
+        className="form-control mb-3"
+        placeholder="Search users..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
 
       {loading ? (
         <Spinner animation="border" className="d-block mx-auto" />
-      ) : users.length === 0 ? (
-        <p>No users found.</p>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-hover table-striped align-middle table-bordered">
-            <thead className="table-dark color-warning text-center">
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Location</th>
-                <th scope="col">Role</th>
-                <th scope="col">Actions</th>
+        <Table striped bordered hover>
+          <thead className="table-dark text-center">
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Location</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody className="text-center">
+            {filteredUsers.map((user) => (
+              <tr key={user.id}>
+                <td>{`${user.firstName} ${user.lastName}`}</td>
+                <td>{user.email}</td>
+                <td>{user.phone}</td>
+                <td>{user.location}</td>
+                <td>{user.role}</td>
+                <td>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDeleteUser(user.id)}
+                  >
+                    Delete
+                  </Button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="text-center">
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{`${user.firstName} ${user.lastName}`}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td className="text-capitalize">{user.location}</td>
-                  <td className="text-capitalize">{user.role}</td>
-                  <td>
-                    <div className="d-flex gap-2 justify-content-center">
-                      <button
-                        className="btn btn-outline-danger btn-sm"
-                        onClick={() => handleDeleteUser(user.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </Table>
       )}
 
-      {/* Modal for adding a new user */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title className="text-center mt-4">Add New User</Modal.Title>
+          <Modal.Title>Add New User</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group controlId="formFirstName">
-              <Form.Label>First Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter first name"
-                value={newUser.first_name}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, first_name: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group controlId="formLastName">
-              <Form.Label>Last Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter last name"
-                value={newUser.last_name}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, last_name: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group controlId="formEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter email"
-                value={newUser.email}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, email: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group controlId="formPhone">
-              <Form.Label>Phone</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter phone number"
-                value={newUser.phone}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, phone: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group controlId="formLocation">
-              <Form.Label>Location</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter location"
-                value={newUser.location}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, location: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group controlId="formRole">
+            {["first_name", "last_name", "email", "phone", "location"].map(
+              (field, index) => (
+                <Form.Group key={index}>
+                  <Form.Label>
+                    {field.replace("_", " ").toUpperCase()}
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={newUser[field]}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, [field]: e.target.value })
+                    }
+                  />
+                </Form.Group>
+              )
+            )}
+            <Form.Group>
               <Form.Label>Role</Form.Label>
               <Form.Control
                 as="select"

@@ -40,6 +40,7 @@ const AdminDashboard = ({ currentUser }) => {
   const [showContractModal, setShowContractModal] = useState(false);
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [selectedContract, setSelectedContract] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const isAdmin = currentUser?.isAdmin; // Assuming user object has isAdmin property
 
   useEffect(() => {
@@ -82,7 +83,7 @@ const AdminDashboard = ({ currentUser }) => {
   const [revenue, setRevenue] = useState(0);
 
   useEffect(() => {
-    const fetchContractsCount = async () => {
+    const fetchCounts = async () => {
       try {
         const contractsRef = collection(db, "contracts");
         const snapshot = await getDocs(contractsRef);
@@ -116,7 +117,7 @@ const AdminDashboard = ({ currentUser }) => {
       }
     };
 
-    fetchContractsCount();
+    fetchCounts();
   }, []);
 
   const handleDelete = async (contractId) => {
@@ -203,6 +204,11 @@ const AdminDashboard = ({ currentUser }) => {
     },
   };
 
+    // Search contracts by name
+    const filteredContracts = contracts.filter((contract) =>
+      contract.contract_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
   // Ensure proper cleanup of chart instances
   useEffect(() => {
     return () => {
@@ -219,6 +225,7 @@ const AdminDashboard = ({ currentUser }) => {
     <div>
       <div className="content">
         <div className="animated fadeIn">
+           {/* Stats Cards */}
           <div className="row mb-4">
             <div className="col-xl-3 col-lg-6">
               <div className="card">
@@ -301,8 +308,22 @@ const AdminDashboard = ({ currentUser }) => {
             </div>
           </div>
 
+           {/* Search Bar */}
+           <div className="row mb-4">
+            <div className="col-12">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by contract name"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // Update search state
+              />
+            </div>
+          </div>
+
+{/* Contract Table */}
           <div className="row mb-4">
-            <div className="">
+            <div className="col-xl-12 col-lg-12">
               <div className="card">
                 <div className="card-body">
                   <h2 className="text-center">Contracts</h2>
@@ -324,7 +345,7 @@ const AdminDashboard = ({ currentUser }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {contracts.map((contract) => (
+                      {filteredContracts.map((contract) => (
                         <tr key={contract.id}>
                           <td>{contract.id}</td>
                           <td>{contract.contract_name}</td>
