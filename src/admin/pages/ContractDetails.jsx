@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom"; // To pass state via routing
 
 const ContractDetails = () => {
@@ -17,11 +17,22 @@ const ContractDetails = () => {
           <h5 className="card-title text-uppercase fw-bold text-primary">
             {contract.contract_name}
           </h5>
-          <p><strong>Approved By:</strong> {contract.approved_by}</p>
-          <p><strong>Total Cost:</strong> ${contract.total_cost}</p>
-          <p><strong>Expiration Date:</strong> {contract.expiration_date}</p>
-          <p><strong>Signing Date:</strong> {contract.signing_date}</p>
-          <p><strong>Status:</strong> {contract.status}</p>
+          <p>
+            <strong>Approved By:</strong> {contract.approved_by}
+          </p>
+          <p>
+            <strong>Total Cost:</strong> ${contract.total_cost}
+          </p>
+          <p>
+            <strong>Expiration Date:</strong> {contract.expiration_date}
+          </p>
+          <p>
+            <strong>Signing Date:</strong> {contract.signing_date}
+          </p>
+          <p>
+            <strong>Status:</strong> {contract.status}
+          </p>
+          
         </div>
       </div>
     </div>

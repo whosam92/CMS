@@ -137,17 +137,17 @@ const AdminDashboard = ({ currentUser }) => {
   };
 
   const pieChartData = {
-    labels: ["Approved", "Pending", "Rejected", "Expired"],
+    labels: ["Approved", "Pending", "Rejected"], // removed expired from pie chart
     datasets: [
       {
         data: [
           contracts.filter((c) => c.status === "approved").length,
           contracts.filter((c) => c.status === "pending").length,
           contracts.filter((c) => c.status === "rejected").length,
-          contracts.filter((c) => c.status === "expired").length,
+          // contracts.filter((c) => c.status === "expired").length,
         ],
-        backgroundColor: ["#28a745", "#ffc107", "#dc3545", "#6c757d"],
-        hoverBackgroundColor: ["#218838", "#e0a800", "#c82333", "#5a6268"],
+        backgroundColor: ["#28a745", "#ffc107", "#dc3545"],
+        hoverBackgroundColor: ["#218838", "#e0a800", "#c82333"],
       },
     ],
   };
@@ -204,10 +204,10 @@ const AdminDashboard = ({ currentUser }) => {
     },
   };
 
-    // Search contracts by name
-    const filteredContracts = contracts.filter((contract) =>
-      contract.contract_name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  // Search contracts by name
+  const filteredContracts = contracts.filter((contract) =>
+    contract.contract_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Ensure proper cleanup of chart instances
   useEffect(() => {
@@ -225,7 +225,7 @@ const AdminDashboard = ({ currentUser }) => {
     <div>
       <div className="content">
         <div className="animated fadeIn">
-           {/* Stats Cards */}
+          {/* Stats Cards */}
           <div className="row mb-4">
             <div className="col-xl-3 col-lg-6">
               <div className="card">
@@ -308,8 +308,8 @@ const AdminDashboard = ({ currentUser }) => {
             </div>
           </div>
 
-           {/* Search Bar */}
-           <div className="row mb-4">
+          {/* Search Bar */}
+          <div className="row mb-4">
             <div className="col-12">
               <input
                 type="text"
@@ -321,7 +321,7 @@ const AdminDashboard = ({ currentUser }) => {
             </div>
           </div>
 
-{/* Contract Table */}
+          {/* Contract Table */}
           <div className="row mb-4">
             <div className="col-xl-12 col-lg-12">
               <div className="card">
@@ -417,17 +417,17 @@ const AdminDashboard = ({ currentUser }) => {
                 </div>
               </div>
             </div>
-              <div className="col-lg-12 mb-4">
-                <div className="card">
-                  <div className="card-body mb-4" style={{ height: "400px" }}>
-                    <h5 className="text-center">Revenue Trends</h5>
-                    <Line
-                      key={JSON.stringify(lineChartData)} // Force reinitialization when data changes
-                      data={lineChartData}
-                      options={lineChartOptions}
-                    />
-                  </div>
+            <div className="col-lg-12 mb-4">
+              <div className="card">
+                <div className="card-body mb-4" style={{ height: "400px" }}>
+                  <h5 className="text-center">Revenue Trends</h5>
+                  <Line
+                    key={JSON.stringify(lineChartData)} // Force reinitialization when data changes
+                    data={lineChartData}
+                    options={lineChartOptions}
+                  />
                 </div>
+              </div>
             </div>
           </div>
         </div>
