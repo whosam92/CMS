@@ -11,12 +11,11 @@ import {
 import { auth, db } from "../firebaseConfig";
 import {
   signInWithEmailAndPassword,
-  signInWithPopup,
   GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-
 
 import "/public/css/input.css";
 
@@ -37,8 +36,10 @@ function Login() {
       const user = userCredential.user;
 
       const userDoc = await getDoc(doc(db, "users", user.uid));
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
+
         if (userData.role === "admin") {
           import("/src/admin/main-admin.jsx").then(() => {
             navigate("/admin");
@@ -53,6 +54,7 @@ function Login() {
       }
     } catch (err) {
       console.error("Login Error:", err.message);
+
       if (err.code === "auth/user-not-found") {
         setError("Email not registered. Please sign up.");
       } else if (err.code === "auth/wrong-password") {
@@ -75,21 +77,22 @@ function Login() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.role === "admin") {
-          import("/src/admin/main-admin.jsx").then(() => {
-            navigate("/admin");
-          });
-        } else {
-          import("/src/main.jsx").then(() => {
-            navigate("/");
-          });
-        }
-      } else {
-        setError("User data not found in the database.");
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          firstName: user.displayName?.split(" ")[0] || "",
+          lastName: user.displayName?.split(" ")[1] || "",
+          email: user.email,
+          phone: user.phoneNumber || "",
+          location: "",
+          role: "user",
+          profileImage: user.photoURL || "",
+        });
       }
+
+      navigate("/");
     } catch (error) {
       console.error("Google Login Error:", error.message);
       setError("Google sign-in failed. Please try again.");
@@ -133,7 +136,7 @@ function Login() {
                   />
 
                   <button
-                    className="w-100 mb-4 btn text-white"
+                    className="w-100 mb-3 btn text-white"
                     style={{ backgroundColor: "#FDA12B" }}
                     size="md"
                     type="submit"
@@ -141,18 +144,13 @@ function Login() {
                     Login
                   </button>
 
-                  <button
-                    type="button"
+                  <MDBBtn
+                    color="light"
+                    className="w-100 mb-4"
                     onClick={handleGoogleLogin}
-                    className="btn btn-outline-light w-100 mb-3"
                   >
-                    <img
-                      src="https://img.icons8.com/color/16/000000/google-logo.png"
-                      alt="Google logo"
-                      className="me-2"
-                    />
                     Sign in with Google
-                  </button>
+                  </MDBBtn>
 
                   {error && (
                     <p
