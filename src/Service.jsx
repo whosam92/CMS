@@ -52,6 +52,8 @@ export default function Service() {
 
     setContractData({
       ...contractData,
+      signing_date: "",
+      expiration_date: "",
       contract_name: service.name,
       total_cost: "",
       status: "pending",

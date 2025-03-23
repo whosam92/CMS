@@ -136,7 +136,7 @@ const Contracts = () => {
   };
 
   const handleView = (contract) => {
-    navigate("/contract-details", { state: { contract } }); // Pass contract to the details page
+    navigate("/admin/contract-details", { state: { contract } }); // Pass contract to the details page
   };
 
   return (
