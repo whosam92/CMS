@@ -9,8 +9,12 @@ import {
   MDBInput,
 } from "mdb-react-ui-kit";
 import { auth, db } from "../firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { collection, doc, getDoc } from "firebase/firestore";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 import "/public/css/input.css";
@@ -37,12 +41,10 @@ function Login() {
         const userData = userDoc.data();
 
         if (userData.role === "admin") {
-          // Dynamically load the admin entry point
           import("/src/admin/main-admin.jsx").then(() => {
             navigate("/admin");
           });
         } else {
-          // Dynamically load the main entry point
           import("/src/main.jsx").then(() => {
             navigate("/");
           });
@@ -69,18 +71,38 @@ function Login() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          firstName: user.displayName?.split(" ")[0] || "",
+          lastName: user.displayName?.split(" ")[1] || "",
+          email: user.email,
+          phone: user.phoneNumber || "",
+          location: "",
+          role: "user",
+          profileImage: user.photoURL || "",
+        });
+      }
+
+      navigate("/");
+    } catch (error) {
+      console.error("Google Login Error:", error.message);
+      setError("Google sign-in failed. Please try again.");
+    }
+  };
+
   return (
     <>
       <MDBContainer fluid className="my-2 align-items-center w-75">
         <MDBRow className="g-0 justify-content-center">
-          {/* <MDBCol md='6'>
-          <img 
-            src="https://mdbootstrap.com/img/new/ecommerce/vertical/004.jpg"
-            className="w-100 rounded-4 shadow-4"
-            alt="Login Illustration"
-          />
-        </MDBCol> */}
-
           <MDBCol md="6">
             <MDBCard className="my-5 cascading-right form-background ">
               <MDBCardBody
@@ -114,13 +136,26 @@ function Login() {
                   />
 
                   <button
-                    className="w-100 mb-4 btn text-white"
+                    className="w-100 mb-3 btn text-white"
                     style={{ backgroundColor: "#FDA12B" }}
                     size="md"
                     type="submit"
                   >
                     Login
                   </button>
+
+                  <MDBBtn
+                    className="w-100 mb-4 d-flex align-items-center justify-content-center gap-2"
+                    style={{
+                      backgroundColor: "#FDA12B", // Your theme's orange color
+                      color: "#fff",
+                      fontWeight: "500",
+                      borderRadius: "5px",
+                    }}
+                    onClick={handleGoogleLogin}
+                  >
+                    <i className="fab fa-google"></i> Sign in with Google
+                  </MDBBtn>
 
                   {error && (
                     <p

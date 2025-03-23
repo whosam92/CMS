@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { db, auth } from "../config/Firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import {
   Container,
   Row,
@@ -13,7 +14,7 @@ import {
 import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const Profile = () => {
+export default function Profile() {
   const [adminData, setAdminData] = useState({
     firstName: "",
     lastName: "",
@@ -27,27 +28,33 @@ const Profile = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchAdminData = async () => {
-      try {
-        const user = auth.currentUser;
-        if (user) {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            setAdminData((prev) => ({ ...prev, ...docSnap.data() }));
-          } else {
-            setError("No such document!");
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const fetchAdminData = async () => {
+          try {
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              setAdminData((prev) => ({ ...prev, ...docSnap.data() }));
+            } else {
+              setError("No such document!");
+            }
+          } catch (error) {
+            console.error("Error fetching admin data:", error);
+            setError("Error fetching admin data");
+          } finally {
+            setLoading(false);
           }
-        }
-      } catch (error) {
-        console.error("Error fetching admin data:", error);
-        setError("Error fetching admin data");
-      } finally {
-        setLoading(false);
-      }
-    };
+        };
 
-    fetchAdminData();
+        fetchAdminData();
+      } else {
+        setLoading(false);
+        setError("User not authenticated");
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const handleChange = (e) => {
@@ -69,6 +76,8 @@ const Profile = () => {
           title: "Profile updated successfully!",
           icon: "success",
           confirmButtonText: "OK",
+          timer: 2000,
+          showConfirmButton: false,
         });
       }
     } catch (error) {
@@ -161,6 +170,4 @@ const Profile = () => {
       </Row>
     </Container>
   );
-};
-
-export default Profile;
+}

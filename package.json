@@ -13,6 +13,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.8",
     "firebase": "^11.5.0",
+    "jspdf": "^3.0.1",
     "lucide-react": "^0.483.0",
     "mdb-react-ui-kit": "^9.0.0",
     "owl.carousel": "^2.3.4",
