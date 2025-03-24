@@ -46,7 +46,15 @@ export default function Service() {
 
   const openForm = (service) => {
     if (!user) {
-      navigate("/auth");
+      Swal.fire({
+        title: "You are not logged in",
+        text: "Please log in to submit a contract.",
+        icon: "warning",
+        confirmButtonColor: "#FFA500",
+        confirmButtonText: "Go to Login",
+      }).then(() => {
+        navigate("/auth");
+      });
       return;
     }
 
@@ -120,10 +128,10 @@ export default function Service() {
         user_id: user.uid,
       });
       Swal.fire({
-        title: 'Contract submitted successfully!',
-        text: 'Your request is pending approval from our team.',
-        icon: 'success',
-        confirmButtonText: 'OK'
+        title: "Contract submitted successfully!",
+        text: "Your request is pending approval from our team.",
+        icon: "success",
+        confirmButtonText: "OK",
       });
       setShowForm(false);
     } catch (error) {
@@ -154,17 +162,24 @@ export default function Service() {
               >
                 <div className="service-item bg-light overflow-hidden h-100">
                   <img
-                      className="img-fluid w-100"
-                      src={service.imageUrl}
-                      alt=""
-                      style={{
-                        minHeight: "300px",
-                        transition: "transform 0.5s ease",
-                      }}
-                      onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
-                      onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                    />
-                  <div className="service-text position-relative text-center p-3 d-flex flex-column justify-content-around" style={{ height: "150px" }}>
+                    className="img-fluid w-100"
+                    src={service.imageUrl}
+                    alt=""
+                    style={{
+                      minHeight: "300px",
+                      transition: "transform 0.5s ease",
+                    }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.transform = "scale(1.1)")
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
+                  />
+                  <div
+                    className="service-text position-relative text-center p-3 d-flex flex-column justify-content-around"
+                    style={{ height: "150px" }}
+                  >
                     <h5 className="mb-3">{service.name}</h5>
                     <button
                       className="btn btn-warning"

@@ -29,8 +29,7 @@ export default function Topbar() {
           <div className="col-lg-7 px-5 text-start">
             <div className="h-100 d-inline-flex align-items-center border-start border-end px-3">
               <small className="fa fa-phone-alt me-2" />
-              <small>  +962777777777
-              </small>
+              <small> +962-123123456</small>
             </div>
             <div className="h-100 d-inline-flex align-items-center border-end px-3">
               <small className="far fa-envelope-open me-2" />

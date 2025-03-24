@@ -19,7 +19,7 @@ export default function Youtube() {
   const [videos, setVideos] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const apiKey = "AIzaSyC3zztIGyRXGt2CVrZPihrAPinqJscdXz4";
-  const query = "Construction Company Renovation Company";
+  const query = "Construction Building Timelapse";
 
   useEffect(() => {
     fetchRandomVideos(apiKey, query, setVideos);
@@ -119,7 +119,13 @@ export default function Youtube() {
                 </button>
               </div>
             ) : (
-              <p style={{ textAlign: "center", fontSize: "1.2rem" }}>
+              <p
+                style={{
+                  color: "orange",
+                  textAlign: "center",
+                  fontSize: "1.2rem",
+                }}
+              >
                 Loading videos...
               </p>
             )}

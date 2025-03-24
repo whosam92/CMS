@@ -108,12 +108,12 @@ function Register() {
                   
                   <MDBInput wrapperClass='mb-4' className='input-transparent' placeholder='Password' type='password'
                     value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  <div className="mb-4">
+                  {/* <div className="mb-4">
                     <select className="input-transparent" value={role} onChange={(e) => setRole(e.target.value)} required>
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
                     </select>
-                  </div>
+                  </div> */}
                   <button className='w-100 mb-4 btn btn-warning' size='md' type="submit">Register</button>
                 </form>
                   {error && (
