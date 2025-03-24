@@ -1,0 +1,30 @@
+.form-background {
+    background-image: url('/img/carousel-2.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: inherit;
+    overflow: hidden;
+    border-radius: 10px;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.input-transparent {
+    background: rgba(0, 0, 0, 0.5); 
+    border: 2px solid #fff;
+    color: white; 
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 16px;
+    outline: none;
+}
+
+.input-transparent::placeholder {
+    color: rgb(255, 255, 255);
+}
+
+.input-transparent:focus {
+    background: rgba(0, 0, 0, 0.5);
+}

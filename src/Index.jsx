@@ -12,7 +12,6 @@ import BackTop from "./components/BackTop";
 export default function Index() {
   return (
     <>
-      
       {/* Carousel Start */}
       <div
         className="container-fluid p-0 mb-5 wow fadeIn"
@@ -25,7 +24,11 @@ export default function Index() {
         >
           <div className="carousel-inner">
             <div className="carousel-item active">
-              <img className="w-100" src="img/carousel-1.jpg" alt="Image" />
+              <img
+                className="w-100"
+                src={`${import.meta.env.BASE_URL}img/carousel-1.jpg`}
+                alt="Image"
+              />
               <div className="carousel-caption">
                 <div className="container">
                   <div className="row justify-content-center">
@@ -56,7 +59,11 @@ export default function Index() {
               </div>
             </div>
             <div className="carousel-item">
-              <img className="w-100" src="img/carousel-2.jpg" alt="Image" />
+              <img
+                className="w-100"
+                src={`${import.meta.env.BASE_URL}img/carousel-2.jpg`}
+                alt="Image"
+              />
               <div className="carousel-caption">
                 <div className="container">
                   <div className="row justify-content-center">
@@ -116,7 +123,11 @@ export default function Index() {
         <div className="row g-0">
           <div className="col-xl-3 col-sm-6 wow fadeIn" data-wow-delay="0.1s">
             <div className="position-relative">
-              <img className="img-fluid w-100" src="img/fact-1.jpg" alt="" />
+              <img
+                className="img-fluid w-100"
+                src={`${import.meta.env.BASE_URL}img/fact-1.jpg`}
+                alt=""
+              />
               <div className="facts-overlay">
                 <h1 className="display-1">01</h1>
                 <h4 className="text-white mb-3">Construction</h4>
@@ -129,7 +140,11 @@ export default function Index() {
           </div>
           <div className="col-xl-3 col-sm-6 wow fadeIn" data-wow-delay="0.3s">
             <div className="position-relative">
-              <img className="img-fluid w-100" src="img/fact-2.jpg" alt="" />
+              <img
+                className="img-fluid w-100"
+                src={`${import.meta.env.BASE_URL}img/fact-2.jpg`}
+                alt=""
+              />
               <div className="facts-overlay">
                 <h1 className="display-1">02</h1>
                 <h4 className="text-white mb-3">Mechanical</h4>
@@ -142,7 +157,11 @@ export default function Index() {
           </div>
           <div className="col-xl-3 col-sm-6 wow fadeIn" data-wow-delay="0.5s">
             <div className="position-relative">
-              <img className="img-fluid w-100" src="img/fact-3.jpg" alt="" />
+              <img
+                className="img-fluid w-100"
+                src={`${import.meta.env.BASE_URL}img/fact-3.jpg`}
+                alt=""
+              />
               <div className="facts-overlay">
                 <h1 className="display-1">03</h1>
                 <h4 className="text-white mb-3">Architecture</h4>
@@ -155,7 +174,11 @@ export default function Index() {
           </div>
           <div className="col-xl-3 col-sm-6 wow fadeIn" data-wow-delay="0.7s">
             <div className="position-relative">
-              <img className="img-fluid w-100" src="img/fact-4.jpg" alt="" />
+              <img
+                className="img-fluid w-100"
+                src={`${import.meta.env.BASE_URL}img/fact-4.jpg`}
+                alt=""
+              />
               <div className="facts-overlay">
                 <h1 className="display-1">04</h1>
                 <h4 className="text-white mb-3">Interior Design</h4>
@@ -270,10 +293,6 @@ export default function Index() {
       <Testimonial />
 
       <Youtube />
-
-      
-
-    
     </>
   );
 }

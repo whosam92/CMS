@@ -53,7 +53,7 @@ export default function TestimonialComp() {
                 <div className="testimonial-item p-4 text-center shadow-sm rounded bg-white">
                   <img
                     className="img-fluid mb-3"
-                    src="img/testimonial-1.jpg"
+                    src={`${import.meta.env.BASE_URL}img/testimonial-1.jpg`}
                     alt="Client"
                     style={{
                       height: "120px",
@@ -85,7 +85,7 @@ export default function TestimonialComp() {
                 <div className="testimonial-item p-4 text-center shadow-sm rounded bg-white">
                   <img
                     className="img-fluid mb-3"
-                    src="img/testimonial-2.jpg"
+                    src={`${import.meta.env.BASE_URL}img/testimonial-2.jpg`}
                     alt="Client"
                     style={{
                       height: "120px",
@@ -100,8 +100,8 @@ export default function TestimonialComp() {
                   <p className="fs-6 text-muted px-2">
                     ““It means so much to me that APEX team care about making
                     everyone feel welcome and listen activaly for all the
-                    requirments we asked for. They help me feel safe and bring my
-                    dream house comes true”
+                    requirments we asked for. They help me feel safe and bring
+                    my dream house comes true”
                   </p>
                   <div
                     className="bg-primary mx-auto mb-3"
